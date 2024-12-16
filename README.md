@@ -1,2 +1,2 @@
 # FM1-PETSc
-# FM1-PETSc
+In this example, I ran FM1.prj using the material parameters listed in Table 1, with two different solvers: PardisoLU and PETSc. I used PardisoLU with 12 cores and PETSc with a single core. The analyses completed successfully without any issues. However, when I enabled parallelization with PETSc, the analysis halted at a specific time step and did not proceed further without any reason.
