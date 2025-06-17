@@ -1,0 +1,38 @@
+@Author Mehran Ghasabeh, Thomas Nagel;
+@Date   19/02/2019;
+@Description{
+};
+
+@Real 'Pi' 3.14159265359;
+@Real 'em'  '2e-3 * Pi';
+@Real 'tmax' 1.;
+@Real 'sigp' '-3e2';
+@Real 'young' '150e3';
+@Real 'poisson' '0.275';
+@Real 'PCohesion' '0.';
+@Real 'PFrictionAngle' '22.';
+@Real 'PDilatancyAngle' '10.';
+
+@MaximumNumberOfSubSteps 1;
+@Behaviour<generic> 'src/libBehaviour.so' 'WeakPlaneModel_nonIter';
+
+@ImposedStrain 'EXY' {0 : 0, 0.25 : 'em', 0.5 : '-em', 0.75 : 'em', 'tmax' : 0.0};
+@ImposedStrain<function> 'EXZ' 'em * sin(Pi * t)';
+@Stress {'sigp', 0, 0, 0, 0, 0};
+@ImposedStrain 'EXX' '0';
+@ImposedStress 'SYY' '0';
+@ImposedStress 'SZZ' '0';
+
+@ExternalStateVariable "Temperature" 293.15;
+
+@MaterialProperty<constant> 'Em' 'young';
+@MaterialProperty<constant> 'nu' 'poisson';
+@MaterialProperty<constant> 'PlaneCohesion' 'PCohesion';
+@MaterialProperty<constant> 'PlaneFrictionAngle' 'PFrictionAngle';
+@MaterialProperty<constant> 'PlaneDilatancyAngle' 'PDilatancyAngle';
+@MaterialProperty<constant> 'Normals[0]' '1.0';
+@MaterialProperty<constant> 'Normals[1]' '0';
+@MaterialProperty<constant> 'Normals[2]' '0';
+
+@Times{0, 'tmax' in 50};
+

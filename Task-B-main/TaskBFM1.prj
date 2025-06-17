@@ -1,0 +1,562 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<OpenGeoSysProject>
+    <mesh>TaskB_mesh.vtu</mesh>
+    <geometry>TaskB.gml</geometry>
+    <processes>
+        <process>
+            <name>HM</name>
+            <type>HYDRO_MECHANICS_WITH_LIE</type>
+            <integration_order>3</integration_order>
+            <use_b_bar>false</use_b_bar>
+            <process_variables>
+                <process_variable>pressure</process_variable>
+                <process_variable>displacement</process_variable>
+                <process_variable>displacement_jump1</process_variable>
+            </process_variables>
+            <constitutive_relation>
+                <type>LinearElasticIsotropic</type>
+                <youngs_modulus>E</youngs_modulus>
+                <poissons_ratio>nu</poissons_ratio>
+                <!--type>MFront</type>
+                <behaviour>MohrCoulombAbboSloan</behaviour>
+                <material_properties>
+                    <material_property name="YoungModulus" parameter="E" />
+                    <material_property name="PoissonRatio" parameter="PoissonRatio" />
+                    <material_property name="Cohesion" parameter="Cohesion" />
+                    <material_property name="FrictionAngle" parameter="FrictionAngle" />
+                    <material_property name="DilatancyAngle" parameter="DilatancyAngle" />
+                    <material_property name="TransitionAngle" parameter="TransitionAngle" />
+                    <material_property name="TensionCutOffParameter"
+                        parameter="TensionCutOffParameter" />
+                </material_properties-->
+            </constitutive_relation>
+            <specific_body_force>0 0</specific_body_force>
+            <initial_effective_stress>effective_stress0</initial_effective_stress>
+            <initial_fracture_effective_stress>fracture_effective_stress0</initial_fracture_effective_stress>
+            <deactivate_matrix_in_flow>1</deactivate_matrix_in_flow>
+            <fracture_model>
+                <type>Coulomb</type>
+                <normal_stiffness>Kn</normal_stiffness>
+                <shear_stiffness>Ks</shear_stiffness>
+               <friction_angle>FrictionAngle</friction_angle>
+                <dilatancy_angle>DilatancyAngle</dilatancy_angle>
+                <cohesion>Cohesion</cohesion>
+                 <penalty_aperture_cutoff>10e-6</penalty_aperture_cutoff>
+                <tension_cutoff>1</tension_cutoff>
+                <nonlinear_solver>
+                    <maximum_iterations>100</maximum_iterations>
+                    <residuum_tolerance>1e-8</residuum_tolerance>
+                    <increment_tolerance>1.e-5</increment_tolerance>
+                </nonlinear_solver>
+            </fracture_model>
+            <fracture_properties>
+                <initial_aperture>aperture0</initial_aperture>
+                <creation_aperture>28e-6</creation_aperture>
+            </fracture_properties>
+            <secondary_variables>
+                <secondary_variable internal_name="sigma" output_name="sigma" />
+                <secondary_variable internal_name="epsilon" output_name="epsilon" />
+                <secondary_variable internal_name="velocity" output_name="velocity" />
+                <secondary_variable internal_name="fracture_velocity" output_name="fracture_velocity" />
+                <secondary_variable internal_name="fracture_permeability" output_name="fracture_permeability" />
+                <secondary_variable internal_name="fracture_stress" output_name="fracture_stress" />
+                <secondary_variable internal_name="fracture_aperture" output_name="fracture_aperture" />
+            </secondary_variables>
+        </process>
+    </processes>
+    <time_loop>
+        <processes>
+            <process ref="HM">
+                <nonlinear_solver>basic_newton</nonlinear_solver>
+                <convergence_criterion>
+                    <type>PerComponentDeltaX</type>
+                    <norm_type>NORM2</norm_type>
+                    <reltols>1e-8 3e-8 1e-8 1e-8 1e-8</reltols>
+                </convergence_criterion>
+                <time_discretization>
+                    <type>BackwardEuler</type>
+                </time_discretization>
+                <time_stepping>
+                    <type>IterationNumberBasedTimeStepping</type>
+                    <t_initial>0.0</t_initial>
+                    <t_end>850</t_end>
+                    <initial_dt>1e-4</initial_dt>
+                    <minimum_dt>1e-5</minimum_dt>
+                    <maximum_dt>10.</maximum_dt>
+                    <number_iterations>2 4 6 8 10 12</number_iterations>
+                    <multiplier> 1.4 1.2 1.1 1. 0.8 0.5</multiplier>
+                </time_stepping>
+            </process>
+        </processes>
+        <output>
+            <type>VTK</type>
+            <prefix>TaskB</prefix>
+            <output_iteration_results>0</output_iteration_results>
+            <timesteps>
+                <pair>
+                    <repeat>1</repeat>
+                    <each_steps>1</each_steps>
+                </pair>
+            </timesteps>
+            <variables>
+                <variable>MaterialIDs</variable>
+                <variable>pressure</variable>
+                <variable>pressure_interpolated</variable>
+                <variable>displacement</variable>
+                <variable>displacement_jump1</variable>
+                <variable>MassFlowRate</variable>
+                <variable>NodalForces</variable>
+                <variable>NodalForcesJump</variable>
+                <variable>sigma</variable>
+                <variable>epsilon</variable>
+                <variable>velocity</variable>
+                <variable>fracture_stress</variable>
+                <variable>fracture_velocity</variable>
+                <variable>fracture_permeability</variable>
+                <variable>fracture_aperture</variable>
+                <variable>sigma_avg</variable>
+                <variable>velocity_avg</variable>
+                <variable>local_jump_w_avg</variable>
+                <variable>fracture_velocity_avg</variable>
+                <variable>fracture_stress_avg</variable>
+                <variable>fracture_aperture_avg</variable>
+                <variable>fracture_permeability_avg</variable>
+            </variables>
+            <suffix>_ts_{:timestep}_t_{:time}</suffix>
+        </output>
+    </time_loop>
+    <media>
+        <medium id="0">
+            <phases>
+                <phase>
+                    <type>AqueousLiquid</type>
+                    <properties>
+                        <property>
+                            <name>viscosity</name>
+                            <type>Parameter</type>
+                            <parameter_name>mu</parameter_name>
+                        </property>
+                        <property>
+                            <name>density</name>
+                            <type>Parameter</type>
+                            <parameter_name>rho_fr</parameter_name>
+                        </property>
+                    </properties>
+                </phase>
+                <phase>
+                    <type>Solid</type>
+                    <properties>
+                        <property>
+                            <name>density</name>
+                            <type>Parameter</type>
+                            <parameter_name>rho_sr</parameter_name>
+                        </property>
+                    </properties>
+                </phase>
+            </phases>
+            <properties>
+                <property>
+                    <name>permeability</name>
+                    <type>Parameter</type>
+                    <parameter_name>k</parameter_name>
+                </property>
+                <property>
+                    <name>reference_temperature</name>
+                    <type>Constant</type>
+                    <value>293.15</value>
+                </property>
+                <property>
+                    <name>porosity</name>
+                    <type>Parameter</type>
+                    <parameter_name>phi</parameter_name>
+                </property>
+                <property>
+                    <name>storage</name>
+                    <type>Parameter</type>
+                    <parameter_name>S</parameter_name>
+                </property>
+                <property>
+                    <name>biot_coefficient</name>
+                    <type>Parameter</type>
+                    <parameter_name>biot_m</parameter_name>
+                </property>
+            </properties>
+        </medium>
+        <medium id="1">
+            <phases>
+                <phase>
+                    <type>AqueousLiquid</type>
+                    <properties>
+                        <property>
+                            <name>viscosity</name>
+                            <type>Parameter</type>
+                            <parameter_name>mu</parameter_name>
+                        </property>
+                        <property>
+                            <name>density</name>
+                            <type>Parameter</type>
+                            <parameter_name>rho_fr</parameter_name>
+                        </property>
+                    </properties>
+                </phase>
+                <phase>
+                    <type>Solid</type>
+                    <properties>
+                        <property>
+                            <name>density</name>
+                            <type>Parameter</type>
+                            <parameter_name>rho_sr</parameter_name>
+                        </property>
+                    </properties>
+                </phase>
+            </phases>
+            <properties>
+                <property>
+                    <name>permeability</name>
+                    <!--type>CubicLawPermeability</type>
+                    <aperture_scaling_factor>bscale</aperture_scaling_factor-->
+                    <type>Function</type>
+                    <value>
+                        <expression>
+                            sqrt(x^2+y^2) > 1.0 ? 
+                             (liquid_phase_pressure > 0.5001e+6 ? 1.0e-3 : 1.0e-4)* 
+                            fracture_aperture * 
+                            (liquid_phase_pressure > 0.5001e+6 ? 1.0e-3 : 1.0e-4) *
+                             fracture_aperture /12.0
+                              : 1e-6 * fracture_aperture * 
+                                fracture_aperture / 12.0
+                        </expression>
+                    </value>
+                    <dvalue>
+                        <variable_name>fracture_aperture</variable_name>
+                        <expression>
+                            sqrt(x^2+y^2) > 1.0 ? 
+                             (liquid_phase_pressure > 0.5001e+6 ? 1.0e-3 : 1.0e-4)* 
+                            (liquid_phase_pressure > 0.5001e+6 ? 1.0e-3 : 1.0e-4) *
+                             fracture_aperture /6.0
+                              : 1e-6 * fracture_aperture / 6.0
+                        </expression>
+                    </dvalue>    
+                </property>
+                <property>
+                    <name>reference_temperature</name>
+                    <type>Constant</type>
+                    <value>293.15</value>
+                </property>
+                <property>
+                    <name>storage</name>
+                    <type>Parameter</type>
+                    <parameter_name>S_f</parameter_name>
+                </property>
+                <property>
+                    <name>biot_coefficient</name>
+                    <type>Parameter</type>
+                    <parameter_name>biot_f</parameter_name>
+                </property>
+            </properties>
+        </medium>
+    </media>
+    <parameters>
+        <parameter>
+            <name>bscale</name>
+            <type>Function</type>
+            <expression> sqrt(x^2+y^2) > 1.0 ? 1e-4 : 1e-4</expression>
+        </parameter>
+        <!--parameter>
+            <name>bi0</name>
+            <type>Constant</type>
+            <value>28e-6</value>
+        </parameter-->
+        <parameter>
+            <name>E</name>
+            <type>Constant</type>
+            <value>6.1065e9</value>
+        </parameter>
+        <parameter>
+            <name>nu</name>
+            <type>Constant</type>
+            <value>.3275</value>
+        </parameter>
+        <!-- Fluid phase properties -->
+        <parameter>
+            <name>rho_fr</name>
+            <type>Constant</type>
+            <value>1e3</value>
+        </parameter>
+        <parameter>
+            <name>mu</name>
+            <type>Constant</type>
+            <value>1e-3</value>
+        </parameter>
+        <!-- Solid phase properties -->
+        <parameter>
+            <name>rho_sr</name>
+            <type>Constant</type>
+            <value>2450</value>
+        </parameter>
+        <!-- Porous medium properties -->
+        <parameter>
+            <name>phi</name>
+            <type>Constant</type>
+            <value>0</value>
+        </parameter>
+        <parameter>
+            <name>k</name>
+            <type>Constant</type>
+            <value>1e-17</value>
+        </parameter>
+        <parameter>
+            <name>S</name>
+            <type>Constant</type>
+            <value>1e-10</value>
+        </parameter>
+        <parameter>
+            <name>biot_m</name>
+            <type>Constant</type>
+            <value>0</value>
+        </parameter>
+        <parameter>
+            <name>PlaneCohesion</name>
+            <type>Constant</type>
+            <value>0</value>
+        </parameter>
+        <!--parameter>
+            <name>PlaneFrictionAngle</name>
+            <type>Constant</type>
+            <value>22.</value>
+        </parameter>
+        <parameter>
+            <name>PlaneDilatancyAngle</name>
+            <type>Constant</type>
+            <value>0.</value>
+        </parameter-->
+        <parameter>
+            <name>Cohesion</name>
+            <type>Constant</type>
+            <value>0</value>
+        </parameter>
+        <parameter>
+            <name>FrictionAngle</name>
+            <type>Constant</type>
+            <value>22</value>
+        </parameter>
+        <parameter>
+            <name>DilatancyAngle</name>
+            <type>Constant</type>
+            <value>0</value>
+        </parameter>
+        <!--parameter>
+            <name>TransitionAngle</name>
+            <type>Constant</type>
+            <value>29</value>
+        </parameter>
+        <parameter>
+            <name>TensionCutOffParameter</name>
+            <type>Constant</type>
+            <value>1.0</value>
+        </parameter>
+        <parameter>
+            <name>Viscosity</name>
+            <type>Constant</type>
+            <value>1.0</value>
+        </parameter-->
+        <!--
+        K=5.9GPa, G=2.3GPa
+        -->
+        <!-- Fracture properties -->
+        <parameter>
+            <name>aperture0</name>
+            <!--type>Function</type>
+            <expression> sqrt(x^2+y^2) > 0.1 ? 1e-5 : 0.0233</expression-->
+            <type>Constant</type>
+            <value>0.0233</value>
+        </parameter>
+        <parameter>
+            <name>S_f</name>
+            <type>Constant</type>
+            <value>4.4e-10</value>
+        </parameter>
+        <parameter>
+            <name>biot_f</name>
+            <type>Constant</type>
+            <value>1</value>
+        </parameter>
+        <parameter>
+            <name>Kn</name>
+            <type>Constant</type>
+            <value>20e9</value>
+        </parameter>
+        <parameter>
+            <name>Ks</name>
+            <type>Constant</type>
+            <value>20e9</value>
+        </parameter>
+        <!-- Flow properties -->
+        <parameter>
+            <name>p0</name>
+            <type>Constant</type>
+            <values>0.5e6</values>
+        </parameter>
+        <parameter>
+            <name>p_in</name>
+            <type>Constant</type>
+            <values>1.0</values>
+        </parameter>
+        <parameter>
+            <name>p_in_transient</name>
+            <type>CurveScaled</type>
+            <curve>timeRamp_p_in</curve>
+            <parameter>p_in</parameter>
+        </parameter>
+        <!-- Mechancis properties -->
+        <parameter>
+            <name>displacement0</name>
+            <type>Constant</type>
+            <values>0 0</values>
+        </parameter>
+        <parameter>
+            <name>effective_stress0</name>
+            <type>Constant</type>
+            <values>-5.3e6 -7.0e6 0 0</values>
+        </parameter>
+        <parameter>
+            <name>fracture_effective_stress0</name>
+            <type>Constant</type>
+            <!-- values: shear stress, normal stress -->
+            <values>-0.65113778e6 -5.10363053e6</values>
+        </parameter>
+        <parameter>
+            <name>zero_u</name>
+            <type>Constant</type>
+            <value>0</value>
+        </parameter>
+    </parameters>
+    <curves>
+        <curve>
+            <name>timeRamp_p_in</name>
+            <coords>0.0  0.09 0.1 0.2 22.5 23.5 99.5 100.5 156.5 157.5 212.5 213.5 266.5 267.5 316.5 317.5
+                419.5   420.5 452.5 453.5 600. 750.</coords>
+            <values>5e5  5e5 5e5 7.446e5 7.446e5 1.919e6 1.919e6 3.627e6 3.627e6 4.094e6 4.094e6 4.511e6
+                4.511e6 4.99e6 4.99e6 5.484e6 5.484e6   6.302e6 6.302e6 3.382e6 3.382e6 3.382e6</values>
+        </curve>
+    </curves>
+    <process_variables>
+        <process_variable>
+            <name>pressure</name>
+            <components>1</components>
+            <order>1</order>
+            <initial_condition>p0</initial_condition>
+            <boundary_conditions>
+                <boundary_condition>
+                    <geometrical_set>TaskB</geometrical_set>
+                    <geometry>INJECTION</geometry>
+                    <type>Dirichlet</type>
+                    <component>0</component>
+                    <parameter>p_in_transient</parameter>
+                </boundary_condition>
+                <boundary_condition>
+                    <geometrical_set>TaskB</geometrical_set>
+                    <geometry>FRACTURE_TOP</geometry>
+                    <type>Dirichlet</type>
+                    <component>0</component>
+                    <parameter>p0</parameter>
+                </boundary_condition>
+                <boundary_condition>
+                    <geometrical_set>TaskB</geometrical_set>
+                    <geometry>FRACTURE_BOTTOM</geometry>
+                    <type>Dirichlet</type>
+                    <component>0</component>
+                    <parameter>p0</parameter>
+                </boundary_condition>
+            </boundary_conditions>
+        </process_variable>
+        <process_variable>
+            <name>displacement</name>
+            <components>2</components>
+            <order>2</order>
+            <initial_condition>displacement0</initial_condition>
+            <boundary_conditions>
+                <boundary_condition>
+                    <geometrical_set>TaskB</geometrical_set>
+                    <geometry>PLY_TOP</geometry>
+                    <type>Dirichlet</type>
+                    <component>1</component>
+                    <parameter>zero_u</parameter>
+                </boundary_condition>
+                <boundary_condition>
+                    <geometrical_set>TaskB</geometrical_set>
+                    <geometry>PLY_BOTTOM</geometry>
+                    <type>Dirichlet</type>
+                    <component>1</component>
+                    <parameter>zero_u</parameter>
+                </boundary_condition>
+                <boundary_condition>
+                    <geometrical_set>TaskB</geometrical_set>
+                    <geometry>PLY_LEFT</geometry>
+                    <type>Dirichlet</type>
+                    <component>0</component>
+                    <parameter>zero_u</parameter>
+                </boundary_condition>
+                <boundary_condition>
+                    <geometrical_set>TaskB</geometrical_set>
+                    <geometry>PLY_RIGHT</geometry>
+                    <type>Dirichlet</type>
+                    <component>0</component>
+                    <parameter>zero_u</parameter>
+                </boundary_condition>
+            </boundary_conditions>
+        </process_variable>
+        <process_variable>
+            <name>displacement_jump1</name>
+            <components>2</components>
+            <order>2</order>
+            <initial_condition>displacement0</initial_condition>
+            <boundary_conditions>
+                <boundary_condition>
+                    <geometrical_set>TaskB</geometrical_set>
+                    <geometry>FRACTURE_TOP</geometry>
+                    <type>Dirichlet</type>
+                    <component>1</component>
+                    <parameter>zero_u</parameter>
+                </boundary_condition>
+                <boundary_condition>
+                    <geometrical_set>TaskB</geometrical_set>
+                    <geometry>FRACTURE_BOTTOM</geometry>
+                    <type>Dirichlet</type>
+                    <component>1</component>
+                    <parameter>zero_u</parameter>
+                </boundary_condition>
+            </boundary_conditions>
+        </process_variable>
+    </process_variables>
+    <nonlinear_solvers>
+        <nonlinear_solver>
+            <name>basic_newton</name>
+            <type>Newton</type>
+            <max_iter>20</max_iter>
+            <linear_solver>general_linear_solver</linear_solver>
+        </nonlinear_solver>
+    </nonlinear_solvers>
+    <linear_solvers>
+        <linear_solver>
+            <name>general_linear_solver</name>
+            <eigen>
+                <solver_type>PardisoLU</solver_type>
+                <!--solver_type>BiCGSTAB</solver_type>
+                <precon_type>ILUT</precon_type>
+                <max_iteration_step>3000</max_iteration_step>
+                <error_tolerance>1e-12</error_tolerance>
+                <scaling>1</scaling-->
+
+            </eigen>
+            <petsc>
+              <prefix>hc</prefix>
+                 <parameters>
+                   -hc_ksp_type gmres
+                   -hc_pc_type hypre
+                   -hc_pc_factor_mat_solver_type mumps
+                 </parameters>
+            </petsc>
+        </linear_solver>
+    </linear_solvers>
+</OpenGeoSysProject>

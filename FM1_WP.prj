@@ -17,15 +17,15 @@
                 <type>MFront</type>
                 <behaviour>WeakPlaneModel</behaviour>
                 <material_properties>
-                    <material_property name="YoungModulus" parameter="YoungModulus" />
-                    <material_property name="PoissonRatio" parameter="PoissonRatio" />
-                    <material_property name="PlaneCohesion" parameter="PlaneCohesion" />
-                    <material_property name="PlaneFrictionAngle" parameter="PlaneFrictionAngle" />
-                    <material_property name="PlaneDilatancyAngle" parameter="PlaneDilatancyAngle" />
-                    <material_property name="Normals[0]" parameter="normals[0]" />
-                    <material_property name="Normals[1]" parameter="normals[1]" />
-                    <material_property name="Normals[2]" parameter="normals[2]" />
-                    <material_property name="Viscosity" parameter="Visc" />
+                    <material_property name="YoungModulus" parameter="YoungModulus"/>
+                    <material_property name="PoissonRatio" parameter="PoissonRatio"/>
+                    <material_property name="PlaneCohesion" parameter="PlaneCohesion"/>
+                    <material_property name="PlaneFrictionAngle" parameter="PlaneFrictionAngle"/>
+                    <material_property name="PlaneDilatancyAngle" parameter="PlaneDilatancyAngle"/>
+                    <material_property name="Normals[0]" parameter="normals[0]"/>
+                    <material_property name="Normals[1]" parameter="normals[1]"/>
+                    <material_property name="Normals[2]" parameter="normals[2]"/>
+                    <material_property name="Viscosity" parameter="Visc"/>
                 </material_properties>
             </constitutive_relation>
             <process_variables>
@@ -33,12 +33,11 @@
                 <pressure>pressure</pressure>
             </process_variables>
             <secondary_variables>
-                <secondary_variable internal_name="sigma" output_name="sigma" />
-                <secondary_variable internal_name="epsilon" output_name="epsilon" />
-                <secondary_variable internal_name="velocity" output_name="velocity" />
-                <secondary_variable internal_name="ElasticStrain" output_name="ElasticStrain" />
-                <secondary_variable internal_name="EquivalentPlasticStrainWeakPlane"
-                    output_name="EquivalentPlasticStrainWeakPlane" />
+                <secondary_variable internal_name="sigma" output_name="sigma"/>
+                <secondary_variable internal_name="epsilon" output_name="epsilon"/>
+                <secondary_variable internal_name="velocity" output_name="velocity"/>
+                <secondary_variable internal_name="ElasticStrain" output_name="ElasticStrain"/>
+                <secondary_variable internal_name="EquivalentPlasticStrainWeakPlane" output_name="EquivalentPlasticStrainWeakPlane"/>
             </secondary_variables>
             <specific_body_force>0. 0.</specific_body_force>
             <initial_stress type="total">Initial_stress</initial_stress>
@@ -52,8 +51,8 @@
                 <convergence_criterion>
                     <type>PerComponentDeltaX</type>
                     <norm_type>NORM2</norm_type>
-                    <abstols>1e-6 5e-9 5e-9</abstols>
-                    <reltols>1e-4 5e-8 5e-8</reltols>
+                    <abstols>1e-6 5e-12 5e-12</abstols>
+                    <reltols>1e-4 5e-12 5e-12</reltols>
                 </convergence_criterion>
                 <time_discretization>
                     <type>BackwardEuler</type>
@@ -491,8 +490,10 @@
         <nonlinear_solver>
             <name>nonlinear_solver</name>
             <type>Newton</type>
+            <!-- <type>PETScSNES</type> -->
             <max_iter>20</max_iter>
-            <damping>0.999</damping>
+            <damping>0.8</damping>
+            <damping_reduction>3</damping_reduction>
             <linear_solver>general_linear_solver</linear_solver>
         </nonlinear_solver>
     </nonlinear_solvers>
@@ -500,25 +501,29 @@
         <linear_solver>
             <name>general_linear_solver</name>
             <eigen>
-               <solver_type>SparseLU</solver_type>
-                <precon_type>DIAGONAL</precon_type>
-                <max_iteration_step>10000</max_iteration_step>
-                <error_tolerance>1e-16</error_tolerance>
+                <solver_type>PardisoLU</solver_type>
+                <!-- <solver_type>SparseLU</solver_type> -->
+                <!-- <precon_type>DIAGONAL</precon_type> -->
+                <!-- <max_iteration_step>10000</max_iteration_step> -->
+                <!-- <error_tolerance>1e-16</error_tolerance> -->
             </eigen>
             <petsc>
-              <prefix>hc</prefix>
-                  <parameters>
-                    -hc_mat_type aij
+                <prefix>hc</prefix>
+                <parameters>
+                    <!-- -hc_snes_type ksponly -->
+                    <!-- -hc_lineserach_type cp -->
+                    <!-- -hc_mat_type aij -->
+                    -hc_ksp_type gmres
                     -hc_pc_type lu
                     -hc_pc_factor_mat_solver_type mumps
                     <!-- -hc_mat_mumps_cntl_1 0.02 -->
                     <!-- -hc_mat_mumps_icntl_7 7 -->
-	            <!-- -hc_mat_mumps_icntl_8 2 -->
+                    <!-- -hc_mat_mumps_icntl_8 2 -->
                     <!-- -hc_mat_mumps_icntl_13 7 -->
                     <!-- -hc_mat_mumps_icntl_14 40 -->
                     <!-- -hc_mat_mumps_icntl_24 2 -->
                     <!-- -hc_mat_mumps_icntl_28 20 -->
-                 </parameters>
+                </parameters>
             </petsc>
         </linear_solver>
     </linear_solvers>

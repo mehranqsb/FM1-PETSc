@@ -490,7 +490,8 @@
             <name>nonlinear_solver</name>
             <type>Newton</type>
             <max_iter>20</max_iter>
-            <damping>0.999</damping>
+            <damping>0.8</damping>
+            <damping_reduction>3</damping_reduction>
             <linear_solver>general_linear_solver</linear_solver>
         </nonlinear_solver>
     </nonlinear_solvers>
@@ -505,6 +506,7 @@
               <prefix>hc</prefix>
                   <parameters>
                     -hc_mat_type aij
+                    -hc_ksp_type gmres
                     -hc_pc_type lu
                     -hc_pc_factor_mat_solver_type mumps
                     <!-- -hc_mat_mumps_cntl_1 0.02 -->
